@@ -1,10 +1,9 @@
-import codecs
 import os
 from setuptools import find_packages, setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open("README.md", "r", encoding="utf-8") as f:
+with open("README.rst", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 VERSION = '0.1.0b'
@@ -19,7 +18,6 @@ setup(
     author_email="<alexanderbaskakov@mail.ru>",
     description=DESCRIPTION,
     long_description=long_description,
-    long_description_content_type="text/markdown",
     packages=find_packages(),
     install_requires=['fastapi', 'gino'],
     keywords=['python', 'fastapi', 'gino', 'viewsets', 'pydantic', 'models'],
