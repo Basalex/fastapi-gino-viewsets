@@ -62,18 +62,6 @@ Available Mixin and ViewSet classes
 * **ReadOnlyViewset** - Provides  **retrieve** and  **retrieve_list** methods
 * **Viewset** - Prodiveds all methods from all mixins, but AggregationMixin
 
-Schema Factory
-~~~~~~~~~~~~~~
-
-| If you want to extend library schemas, you're welcome to use `SchemaFactory` class
-
-| It provides following methods for schema building
-
-* **input_schema**
-* **output_schema**
-* **patch_schema**
-* **list_schema**
-* **filter_schema**
 
 | Example
 

@@ -8,15 +8,15 @@ from sqlalchemy import Column
 from .utils import get_model_fields, make_pydantic_dataclass
 
 FIELD_METHODS_BY_TYPE = {
-    int: ("le", "ge"),
-    float: ("le", "ge"),
+    int: ('le', 'ge'),
+    float: ('le', 'ge'),
 }
 
 DefaultValue = object()
 
 
 class MetaWrapper:
-    """
+    '''
         class Meta params:
             @param: model -> required, must set to generate schema for given db model
             @param: required -> if set, only listed fields will be considered as required ones
@@ -37,34 +37,34 @@ class MetaWrapper:
                     integer_field_name__gt
                     field_name__lte
                     field_name__gte
-    """
+    '''
 
     __slots__ = (
-        "model",
-        "required",
-        "fields",
-        "exclude",
-        "use_db_names",
-        "list_pk",
-        "as_dataclass",
-        "as_list_fields",
-        "field_methods",
-        "field_methods_by_name",
+        'model',
+        'required',
+        'fields',
+        'exclude',
+        'use_db_names',
+        'list_pk',
+        'as_dataclass',
+        'as_list_fields',
+        'field_methods',
+        'field_methods_by_name',
     )
 
     def __init__(self, meta):
         self.model = meta.model
-        self.required = getattr(meta, "required", None)
-        self.fields = getattr(meta, "fields", None)
-        self.exclude = getattr(meta, "exclude", None)
-        self.use_db_names = getattr(meta, "use_db_names", None)
-        self.field_methods = getattr(meta, "field_methods", {})
+        self.required = getattr(meta, 'required', None)
+        self.fields = getattr(meta, 'fields', None)
+        self.exclude = getattr(meta, 'exclude', None)
+        self.use_db_names = getattr(meta, 'use_db_names', None)
+        self.field_methods = getattr(meta, 'field_methods', {})
         if self.field_methods is True:
             self.field_methods = FIELD_METHODS_BY_TYPE
-        self.field_methods_by_name = getattr(meta, "field_methods_by_name", None)
-        self.list_pk = getattr(meta, "list_pk", False)
-        self.as_list_fields = getattr(meta, "as_list_fields", None)
-        self.as_dataclass = getattr(meta, "as_dataclass", False)
+        self.field_methods_by_name = getattr(meta, 'field_methods_by_name', None)
+        self.list_pk = getattr(meta, 'list_pk', False)
+        self.as_list_fields = getattr(meta, 'as_list_fields', None)
+        self.as_dataclass = getattr(meta, 'as_dataclass', False)
 
     def is_excluded(self, field_name):
         if self.fields:
@@ -84,7 +84,7 @@ class MetaWrapper:
 
 
 class FieldWrapper:
-    __slots__ = ("field", "_is_required", "field_name")
+    __slots__ = ('field', '_is_required', 'field_name')
 
     def __init__(
         self, field, field_name: str, is_required: Optional[bool] = None,
@@ -119,13 +119,13 @@ class FieldWrapper:
 class GinoModelMeta(ModelMetaclass):
     @no_type_check
     def __new__(mcs, name, bases, attrs):
-        meta = attrs.pop("Meta", None)  # None for abstract schemas
+        meta = attrs.pop('Meta', None)  # None for abstract schemas
         if meta:
             try:
-                model = getattr(meta, "model")
+                model = getattr(meta, 'model')
             except AttributeError:
                 raise NotImplementedError(
-                    "Attribute `model` of class Meta is required!"
+                    'Attribute `model` of class Meta is required!'
                 ) from None
 
             meta = MetaWrapper(meta)
@@ -154,7 +154,7 @@ class GinoModelMeta(ModelMetaclass):
                     methods = meta.get_methods(field_name, python_type)
                     if methods is not None:
                         for method in methods:
-                            f_field_name = f"{field_name}__{method}"
+                            f_field_name = f'{field_name}__{method}'
                             types[f_field_name] = (python_type, required)
                     else:
                         types[field_name] = (python_type, required)
@@ -164,7 +164,14 @@ class GinoModelMeta(ModelMetaclass):
                 for field_name, (type_, default) in types.items():
                     field = (field_name, type_) if default is ... else (field_name, type_, default)
                     fields.append(field)
-                fields.extend(attrs.get('__annotations__', {}).items())
+
+                for field_name, field_type in attrs.get('__annotations__', {}).items():
+                    attrs = getattr(field_type, '__args__', None)
+                    if attrs is not None and type(None) in attrs:
+                        fields.append((field_name, attrs[0], None))
+                    else:
+                        fields.append((field_name, field_type))
+
                 fields.sort(key=lambda f: len(f))
                 return make_pydantic_dataclass(name, fields=fields)
 
@@ -177,24 +184,7 @@ class GinoModelMeta(ModelMetaclass):
             return create_model(
                 name,
                 __base__=super().__new__(mcs, name, bases, attrs),
-                __module__=attrs.get("__module__"),
+                __module__=attrs.get('__module__'),
                 **types
-            )
-        return super().__new__(mcs, name, bases, attrs)
-
-
-class WrapperMeta(ModelMetaclass):
-    @no_type_check
-    def __new__(mcs, name, bases, attrs):
-        meta = attrs.pop("Meta", None)  # None for abstract schemas
-        if meta is not None:
-            key_name = getattr(meta, "key_name", None)
-            if key_name is None:
-                raise ValueError("Attribute key_name is required for class Meta")
-            return create_model(
-                name,
-                __base__=super().__new__(mcs, name, bases, attrs),
-                __module__=attrs.get("__module__"),
-                **{meta.key_name: ""}
             )
         return super().__new__(mcs, name, bases, attrs)

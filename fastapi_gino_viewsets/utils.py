@@ -41,7 +41,7 @@ def get_model_fields(model: Type[CRUDModel]):
 
 
 def camel_to_snake_case(words: str):
-    return re.sub("([A-Z][a-z]+)", r"\1_", words).rstrip("_").lower()
+    return re.sub('([A-Z][a-z]+)', r'\1_', words).rstrip('_').lower()
 
 
 def create_meta_class(model, **kwargs):

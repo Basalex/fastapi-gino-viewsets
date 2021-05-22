@@ -1,6 +1,6 @@
 from . import mixins
 
-__all__ = ["ViewSet", "ReadOnlyViewSet"]
+__all__ = ['ViewSet', 'ReadOnlyViewSet']
 
 
 class ViewSet(

@@ -46,7 +46,7 @@ class MethodFactory:
         async def update_partial(
                 cls,
                 request: schema,
-                param: key_type = Path(..., alias=key_name)
+                param: key_type = Path(..., alias=key_name),
         ):
             field = getattr(cls.model, cls.key_name)
             entity = await cls.retrieve_function(cls.model, where=field == param)

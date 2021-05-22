@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 
-from fastapi_gino_viewsets.base_schemas import BaseSchema
+from fastapi_gino_viewsets.schemas import BaseSchema
 from fastapi_gino_viewsets.mixins import (
     AggregateObjectMixin,
     CreateModelMixin,

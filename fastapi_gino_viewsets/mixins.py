@@ -8,20 +8,20 @@ from sqlalchemy.sql import ClauseElement, operators as op
 from starlette import status
 from starlette.requests import Request
 
-from .base_schemas import BaseDeleteSchema, BaseSchema, BaseModelSchema, BasePaginatedListSchema
+from .schemas import BaseDeleteSchema, BaseSchema, BaseModelSchema, BasePaginatedListSchema
 from .dynamic_methods import MethodFactory
 from .schema_factory import SchemaFactory
 from .utils import is_method_overloaded, get_object_or_404
 
 __all__ = [
-    "AggregateObjectMixin",
-    "CreateModelMixin",
-    "DeleteModelMixin",
-    "BaseListModelMixin",
-    "ListModelMixin",
-    "RetrieveModelMixin",
-    "UpdateModelMixin",
-    "UpdatePartialModelMixin",
+    'AggregateObjectMixin',
+    'CreateModelMixin',
+    'DeleteModelMixin',
+    'BaseListModelMixin',
+    'ListModelMixin',
+    'RetrieveModelMixin',
+    'UpdateModelMixin',
+    'UpdatePartialModelMixin',
 ]
 
 
@@ -30,6 +30,7 @@ class BaseMixin:
     input_schema = None
     output_schema = None
     wrapper_schema = None
+    params = {}
 
 
 class ViewSetMeta(type):
@@ -44,23 +45,23 @@ class ViewSetMeta(type):
             else:
                 raise NotImplementedError(f'Base schema is not implemented for class {name}')
             attrs['input_schema'] = attrs.get(
-                'input_schema'
+                'input_schema',
             ) or SchemaFactory.input_schema(
                 model,
                 base_schema=base_schema,
                 exclude=('id', 'created_at', 'updated_at')
             )
             output_schema = attrs.get('output_schema') or SchemaFactory.output_schema(model, base_schema)
-            wrapper_schema = attrs.get("wrapper_schema")
+            wrapper_schema = attrs.get('wrapper_schema')
             if wrapper_schema is not None:
                 output_schema = type(
-                    f"{output_schema.__name__}",
+                    f'{output_schema.__name__}',
                     (wrapper_schema, ),
                     {
-                        "__annotations__": {
+                        '__annotations__': {
                             **wrapper_schema.__annotations__,
                             wrapper_schema.__wrapper_key__: output_schema,
-                        }
+                        },
                     },
                 )
             attrs['output_schema'] = output_schema
@@ -76,7 +77,7 @@ class BaseFilterMixin(BaseMixin):
 
     @classmethod
     def _handler_filter(cls, model, field_name, value):
-        field_name, _, method = field_name.partition("__")
+        field_name, _, method = field_name.partition('__')
         field = getattr(model, field_name)
 
         if method:
@@ -95,7 +96,7 @@ class BaseFilterMixin(BaseMixin):
 
     @classmethod
     def filter_query(cls, request: Request, query, filter_schema):
-        if hasattr(filter_schema, "dict"):
+        if hasattr(filter_schema, 'dict'):
             filters = filter_schema.dict(exclude_defaults=True).items()
         else:
             filters = [
@@ -105,7 +106,7 @@ class BaseFilterMixin(BaseMixin):
             sa.and_(
                 cls._handler_filter(cls.model, field_name, value)
                 for field_name, value in filters
-            )
+            ),
         )
 
 
@@ -119,20 +120,20 @@ class RetrieveModelMixin(SingleObjectMixin, BaseModelMixin):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if not is_method_overloaded(cls, "retrieve"):
+        if not is_method_overloaded(cls, 'retrieve'):
             cls.retrieve = classmethod(
                 MethodFactory.make_retrieve(
                     cls.key_name,
                     cls.key_type,
                     cls.wrapper_schema and cls.wrapper_schema.__wrapper_key__,
-                )
+                ),
             )
 
 
 class AggregateObjectMixin(BaseFilterMixin):
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if not is_method_overloaded(cls, "retrieve_single_object_data"):
+        if not is_method_overloaded(cls, 'retrieve_single_object_data'):
             cls.retrieve_single_object_data = classmethod(
                 MethodFactory.make_retrieve_single_object_data(cls.filter_schema)
             )
@@ -150,23 +151,23 @@ class BaseListModelMixin(BaseFilterMixin):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        model = getattr(cls, "model", None)
+        model = getattr(cls, 'model', None)
         if model is not None:
             if cls.list_schema is None:
                 cls.list_schema = SchemaFactory.list_schema(
                     cls.output_schema,
                     cls.base_list_schema,
-                    f"{model.__name__.title()}ListSchema",
+                    f'{model.__name__.title()}ListSchema',
                 )
             if cls.filter_schema is None:
                 cls.filter_schema = SchemaFactory.filter_schema(
-                    model, f"{cls.__name__}FilterSchema"
+                    model, f'{cls.__name__}FilterSchema'
                 )
-            if not is_method_overloaded(cls, "retrieve_list"):
+            if not is_method_overloaded(cls, 'retrieve_list'):
                 cls.retrieve_list = classmethod(
                     MethodFactory.make_retrieve_list(
                         cls.filter_schema,
-                    )
+                    ),
                 )
 
     @classmethod
@@ -178,7 +179,7 @@ class BaseListModelMixin(BaseFilterMixin):
         columns = query.c
         sort_fields = []
         for field_name in sort:
-            _, is_desc, field_name = field_name.rpartition("-")
+            _, is_desc, field_name = field_name.rpartition('-')
             field = getattr(columns, field_name, None)
             if field is None and cls.model is not None:
                 field = getattr(cls.model, field_name)
@@ -203,11 +204,11 @@ class BaseListModelMixin(BaseFilterMixin):
     @classmethod
     def prepare_response(cls, data, offset, limit, total):
         data = {
-            "data": data,
-            "pagination": {
-                "offset": offset,
-                "limit": limit,
-                "total": total,
+            'data': data,
+            'pagination': {
+                'offset': offset,
+                'limit': limit,
+                'total': total,
             },
         }
         return data
@@ -232,7 +233,7 @@ class CreateModelMixin(BaseModelMixin):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if not is_method_overloaded(cls, "create"):
+        if not is_method_overloaded(cls, 'create'):
             cls.create = classmethod(
                 MethodFactory.make_create(
                     cls.get_create_schema(),
@@ -252,7 +253,7 @@ class UpdateModelMixin(SingleObjectMixin, BaseModelMixin):
         super().__init_subclass__(**kwargs)
         if cls.put_schema is None and cls.model is not None:
             cls.put_schema = SchemaFactory.put_schema(cls.model, cls.base_schema)
-        if not is_method_overloaded(cls, "update"):
+        if not is_method_overloaded(cls, 'update'):
             cls.update = classmethod(
                 MethodFactory.make_update(
                     cls.get_put_schema(),
@@ -274,7 +275,7 @@ class UpdatePartialModelMixin(SingleObjectMixin, BaseModelUpdateMixin):
         super().__init_subclass__(**kwargs)
         if cls.patch_schema is None and cls.model is not None:
             cls.patch_schema = SchemaFactory.patch_schema(cls.model, cls.base_schema)
-        if not is_method_overloaded(cls, "update_partial"):
+        if not is_method_overloaded(cls, 'update_partial'):
             cls.update_partial = classmethod(
                 MethodFactory.make_update_partial(
                     cls.get_patch_schema(),
@@ -294,7 +295,7 @@ class DeleteModelMixin(SingleObjectMixin, BaseMixin):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if not is_method_overloaded(cls, "delete"):
+        if not is_method_overloaded(cls, 'delete'):
             cls.delete = classmethod(
                 MethodFactory.make_delete(
                     cls.key_name,
@@ -308,13 +309,13 @@ class DeleteModelMixin(SingleObjectMixin, BaseMixin):
         delete_schema = cls.delete_schema or BaseDeleteSchema
         if cls.wrapper_schema is not None:
             delete_schema = type(
-                f"W{delete_schema.__name__}",
+                f'W{delete_schema.__name__}',
                 (cls.wrapper_schema,),
                 {
-                    "__annotations__": {
+                    '__annotations__': {
                         **cls.wrapper_schema.__annotations__,
                         cls.wrapper_schema.__wrapper_key__: delete_schema,
-                    }
+                    },
                 },
             )
         return delete_schema
