@@ -2,13 +2,14 @@ from dataclasses import asdict
 from typing import Iterable
 
 import sqlalchemy as sa
+from ginodantic import BaseModelSchema
 from pydantic import BaseModel
 from sqlalchemy import asc, desc
 from sqlalchemy.sql import ClauseElement, operators as op
 from starlette import status
 from starlette.requests import Request
 
-from .schemas import BaseDeleteSchema, BaseSchema, BaseModelSchema, BasePaginatedListSchema
+from .schemas import BaseDeleteSchema, BaseSchema, BasePaginatedListSchema
 from .dynamic_methods import MethodFactory
 from .schema_factory import SchemaFactory
 from .utils import is_method_overloaded, get_object_or_404

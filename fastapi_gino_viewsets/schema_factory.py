@@ -1,9 +1,9 @@
 from collections import defaultdict
 from typing import List
 
+from ginodantic.gino_model_meta import GinoModelMeta
 from pydantic.main import ModelMetaclass
 
-from .gino_model_meta import GinoModelMeta
 from .utils import create_meta_class
 
 __all__ = ['SchemaFactory']

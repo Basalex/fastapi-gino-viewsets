@@ -3,13 +3,11 @@ from typing import List, Any
 from pydantic import BaseModel
 
 from fastapi_gino_viewsets.base_config import BaseConfig
-from fastapi_gino_viewsets.gino_model_meta import GinoModelMeta
 
 __all__ = [
     'BaseDeleteSchema',
     'BaseFilterMeta',
     'BaseListSchema',
-    'BaseModelSchema',
     'BasePaginatedListSchema',
     'BaseSchema',
     'BaseWrapperSchema',
@@ -38,11 +36,6 @@ class BasePaginatedListSchema(BaseListSchema):
 class BaseSchema(BaseModel):
     class Config(BaseConfig):
         use_enum_values = True
-
-
-class BaseModelSchema(BaseModel, metaclass=GinoModelMeta):
-    class Config(BaseConfig):
-        pass
 
 
 class BaseWrapperSchema(BaseModel):

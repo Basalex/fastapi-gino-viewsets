@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import List
 
 import pytest
+from ginodantic import BaseModelSchema
 from pydantic import ValidationError, BaseModel
 
-from fastapi_gino_viewsets.schemas import BaseModelSchema
 from tests.models import User, UserType
 from gino.json_support import DATETIME_FORMAT
 

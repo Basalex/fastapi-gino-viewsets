@@ -1,11 +1,11 @@
 from typing import Optional
 
 from fastapi import FastAPI, Request
+from ginodantic import BaseModelSchema
 from pydantic.main import BaseModel
 from starlette.testclient import TestClient
 
 from fastapi_gino_viewsets import MainRouter, ViewSet
-from fastapi_gino_viewsets.schemas import BaseModelSchema
 from tests.models import User, UserType
 from tests.utils import NoNoneDict
 

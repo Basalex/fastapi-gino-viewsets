@@ -1,8 +1,8 @@
 import pytest
+from ginodantic import BaseModelSchema
+from ginodantic.gino_model_meta import GinoModelMeta
 
-from fastapi_gino_viewsets.schemas import BaseModelSchema
 from fastapi_gino_viewsets.utils import create_meta_class
-from fastapi_gino_viewsets.gino_model_meta import GinoModelMeta
 from tests.models import User
 
 
