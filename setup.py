@@ -30,6 +30,6 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ],
     project_urls={
-        "Source": "https://github.com/basalex/fastapi_gino_viewsets",
+        "Source": "https://github.com/Basalex/fastapi-gino-viewsets",
     },
 )
