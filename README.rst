@@ -20,9 +20,10 @@ Create your model and migrate database
 
     class User(db.Model):
         __tablename__ = 'users'
-        id = db.Column(db.BigInteger(), primary_key=True)
+        id = db.Column(db.Integer(), primary_key=True)
         username = db.Column(db.String(255), nullable=False, unique=True)
         email = db.Column(db.EmailType, nullable=False, unique=True)
+        age = db.Column(db.Integer(), nullable=True)
 
 Then, you would want to use MainRouter class
 
@@ -63,22 +64,19 @@ Available Mixin and ViewSet classes
 * **Viewset** - Prodiveds all methods from all mixins, but AggregationMixin
 
 
-| Example
+| Generating custom schemas
 
-.. code:: python
-
-    from fastapi_gino_viewsets import SchemaFactory
-
-    BaseUserSchema = SchemaFactory.output_schema(User, 'UserSchema')
-
-    class UserSchema(BaseUserSchema):
-        age: Optional[int] = None
-
-| There are some options available, applied by defining Meta class
-
-* **required: Tuple[str]** -> only listed fields will be defined as required, can be set as empty tuple
-* **exclude: Tuple[str]** -> excludes listed fields from generated schema
-* **use_db_names: Tuple[str]** -> use database field names instead of model field names
+* **Meta Class Options**
+    * **as_dataclass: bool** -> pydantic dataclass will be used for generated schema
+    * **as_list_fields: Tuple[str]** -> listed fields will be generated as List[type]
+    * **field_methods: bool** -> int and float fields will be generated with postfix __ge, and postfix __le,
+    * **field_methods_by_name: Dict[str, List[str]]** -> use database field names instead of model field names
+    * **fields: Tuple[str]** -> only listed fields will be used for generated schema
+    * **field_methods: Tuple[str]** -> excludes listed fields from generated schema
+    * **exclude: Tuple[str]** -> excludes listed fields from generated schema
+    * **list_pk: bool** -> Foreign key and primary key will be interpreted as list
+    * **required: Tuple[str]** -> only listed fields will be defined as required, can be set as empty tuple
+    * **use_db_names: bool** -> use database field names instead of model field names
 
 .. code:: python
 
@@ -90,6 +88,7 @@ Available Mixin and ViewSet classes
             required: ()
             exclude: ('email', )
             use_db_names: False
+            field_methods_by_name = {'age': ('le', 'ge')}
 
 | This would be almost equal for the following schema
 
@@ -98,6 +97,5 @@ Available Mixin and ViewSet classes
     class UserSchema(BaseModel):
         id: Optional[int] = None
         username: Optional[str] = None
-
-
-## SchemaFactory.list_schema
+        age__le: Optional[str] = None
+        age__ge: Optional[str] = None

@@ -6,7 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open("README.rst", "r", encoding="utf-8") as f:
     long_description = f.read()
 
-VERSION = '0.1.0b2'
+VERSION = '0.1.0b4'
 DESCRIPTION = 'FastApi Gino ViewSets'
 LONG_DESCRIPTION = 'A package that boosts API creation'
 
@@ -22,7 +22,7 @@ setup(
     install_requires=['fastapi', 'gino'],
     keywords=['python', 'fastapi', 'gino', 'viewsets', 'pydantic', 'models'],
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 4 -  Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
         "Operating System :: Unix",
