@@ -34,7 +34,7 @@ Then, you would want to use MainRouter class
 
     router = MainRouter()
 
-    @router.add_view('/user)
+    @router.add_view('/user')
     class UserViewSet(ViewSet):
         model = User
 
